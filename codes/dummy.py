@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\dataset\ParsingTests\uc.png")
-save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\dataset\ParsingTests\Tests"
+image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests\uc.png")
+save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests\Tests"
 
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
