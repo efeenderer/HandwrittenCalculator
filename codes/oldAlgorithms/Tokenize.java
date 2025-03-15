@@ -142,11 +142,7 @@ public class Tokenize {
                                 currentToken.setLength(0);
                                 continue;
                             }
-<<<<<<< HEAD
-/*
-=======
                         /*
->>>>>>> basic_recognition
                         if (currentToken.length() > 0) {
                             tokens.add(createNumberToken(currentToken.toString()));
                             currentToken.setLength(0);
