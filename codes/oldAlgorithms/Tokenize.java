@@ -142,7 +142,11 @@ public class Tokenize {
                                 currentToken.setLength(0);
                                 continue;
                             }
+<<<<<<< HEAD
 /*
+=======
+                        /*
+>>>>>>> basic_recognition
                         if (currentToken.length() > 0) {
                             tokens.add(createNumberToken(currentToken.toString()));
                             currentToken.setLength(0);
@@ -184,17 +188,17 @@ public class Tokenize {
     // Operatör tokenlarını oluşturuyoruz
 
     public static final OperatorToken OP_ADD = new OperatorToken("+", OperatorToken.OperatorType.LEFT, 2);
-        public static final OperatorToken OP_SUB = new OperatorToken("-", OperatorToken.OperatorType.LEFT, 2);
-        public static final OperatorToken OP_MUL = new OperatorToken("*", OperatorToken.OperatorType.LEFT, 3);
-        public static final OperatorToken OP_DIV = new OperatorToken("/", OperatorToken.OperatorType.LEFT, 3);
-        public static final OperatorToken OP_POW = new OperatorToken("^", OperatorToken.OperatorType.RIGHT, 5);
+    public static final OperatorToken OP_SUB = new OperatorToken("-", OperatorToken.OperatorType.LEFT, 2);
+    public static final OperatorToken OP_MUL = new OperatorToken("*", OperatorToken.OperatorType.LEFT, 3);
+    public static final OperatorToken OP_DIV = new OperatorToken("/", OperatorToken.OperatorType.LEFT, 3);
+    public static final OperatorToken OP_POW = new OperatorToken("^", OperatorToken.OperatorType.RIGHT, 5);
 
-        public static final OperatorToken OP_NEGATIVE = new OperatorToken("-", OperatorToken.OperatorType.PREFIX, 4);
-        public static final OperatorToken OP_FACT = new OperatorToken("!", OperatorToken.OperatorType.SUFFIX, 6);
-        public static final OperatorToken OP_PERC = new OperatorToken("%", OperatorToken.OperatorType.SUFFIX, 7);
-        public static final OperatorToken OP_SQRT = new OperatorToken("√", OperatorToken.OperatorType.PREFIX, 8);
-        public static final OperatorToken OP_LPAR = new OperatorToken("(", OperatorToken.OperatorType.PREFIX, 0);
-        public static final OperatorToken OP_RPAR = new OperatorToken(")", OperatorToken.OperatorType.SUFFIX, 0);
+    public static final OperatorToken OP_NEGATIVE = new OperatorToken("-", OperatorToken.OperatorType.PREFIX, 4);
+    public static final OperatorToken OP_FACT = new OperatorToken("!", OperatorToken.OperatorType.SUFFIX, 6);
+    public static final OperatorToken OP_PERC = new OperatorToken("%", OperatorToken.OperatorType.SUFFIX, 7);
+    public static final OperatorToken OP_SQRT = new OperatorToken("√", OperatorToken.OperatorType.PREFIX, 8);
+    public static final OperatorToken OP_LPAR = new OperatorToken("(", OperatorToken.OperatorType.PREFIX, 0);
+    public static final OperatorToken OP_RPAR = new OperatorToken(")", OperatorToken.OperatorType.SUFFIX, 0);
 
 
     //Function Tokenlar
