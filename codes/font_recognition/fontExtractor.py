@@ -20,28 +20,10 @@ for font_name in os.listdir(fonts_path):
 
     print(f"Height: {height}   Width: {width}")
 
-    #cv.imshow("gray",gray)
-
     _,thresh = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU) 
     cv.waitKey(0) 
-    
-    #cv.imshow("edged",edged)
-
     contours, _ = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
-   
-
-    #cv.imshow("Contours",all_chars)
-    cv.waitKey(0) 
-    cv.destroyAllWindows() 
-
-    """
-    for i, contour in enumerate(contours):
-        x, y, h, w = cv.boundingRect(contour)
-        char_image = all_chars[y:y+h , x:x+w]
-
-        cv.imwrite(filename=font_path + f"\\{i}.png",img=char_image)
-        """
     char_images = []
     only_contours = []
     for contour in contours:
@@ -66,5 +48,5 @@ for font_name in os.listdir(fonts_path):
         only_contours.append(contour_image)
 
     for i, char in enumerate(char_images):
-        cv.imwrite(f"{font_path}\{i}_cut.png", char)
-        cv.imwrite(f"{font_path}\{i}_contour.png", only_contours[i])
+        cv.imwrite(f"{font_path}\{i}.png", char)
+        #cv.imwrite(f"{font_path}\{i}_contour.png", only_contours[i])
