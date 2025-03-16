@@ -3,6 +3,20 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+
+print([a for a in range(0,8)])
+
+
+
+
+
+
+
+
+
+
+
+"""
 images_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests"
 
 for images in os.listdir(images_path):
@@ -60,3 +74,4 @@ for images in os.listdir(images_path):
         for i, char in enumerate(char_images):
             cv2.imwrite(f"{save_path}\{i}_cut.png", char)
             cv2.imwrite(f"{save_path}\{i}_contour.png", only_contours[i])
+"""
