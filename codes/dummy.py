@@ -3,17 +3,12 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
+bitmap1 = ['0','0','0','3','0','0','0','0','0','0']
+bitmap2 = ['0','0','0','0','0','0','0','0','0','0']
+bitmap3 = ['0','0','0','0','0','0','0','0','0','0']
 
-print([a for a in range(0,8)])
-
-
-
-
-
-
-
-
-
+if bitmap3 == bitmap1:
+    print("Ender")
 
 
 """

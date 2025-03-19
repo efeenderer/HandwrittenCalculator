@@ -2,8 +2,8 @@ import numpy as np
 import cv2 
 import os
 
-bits = 5
-percentage = .30
+bits = 6
+percentage = .25
 
 def BitMap(Image: np.ndarray) -> np.ndarray:
 
@@ -38,7 +38,7 @@ def BitMap(Image: np.ndarray) -> np.ndarray:
 
 characters_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\letters_square"
 image_saves_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bitmaps_images"
-
+bitmap_saves_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bitmaps"
 
 
 text =""
@@ -52,24 +52,33 @@ for font in os.listdir(characters_path):
         os.makedirs(image_save_path,exist_ok=True)
         
         for char in os.listdir(font_path):
-            text += "\n\n"
-
-            text += f"{font} {char} \n"
+            char_name = char.split(".")[-2].split("_")[-2]
+            char_type = char.split(".")[-2].split("_")[-3]
+            text += f"{char_type}_{char_name}#"
 
             img_path = os.path.join(font_path,char)
             Image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            Image = cv2.resize(Image, (125,125),interpolation=cv2.INTER_NEAREST)
+            Image = cv2.resize(Image, (108,108),interpolation=cv2.INTER_NEAREST)
 
             bit_map = BitMap(Image)
-            text += f"{bit_map} "
+            
+            text += f"{bit_map.tolist()}\n"
 
             bit_map_2d = bit_map.reshape((bits, bits))
 
             scale_factor = 20  
+
             image_resized = cv2.resize(bit_map_2d, (bits * scale_factor, bits * scale_factor), interpolation=cv2.INTER_NEAREST)
             image_resized = np.transpose(image_resized)
             cv2.imwrite(os.path.join(image_save_path, char), image_resized)
 
+
+            bitmap_save_path = os.path.join(bitmap_saves_path,font + ".txt")
+
+        with open(bitmap_save_path,"w") as f:
+            text = text[:-1]
+            f.write(text) 
+            text =""
 
 
 
@@ -77,5 +86,4 @@ for font in os.listdir(characters_path):
     except Exception as e:
         print(f"Error: {e}")
 
-with open(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bit_maps.txt","w+") as f:
-    f.write(text) 
+
