@@ -2,8 +2,8 @@ import numpy as np
 import cv2 
 import os
 
-bits = 6
-percentage = .25
+bits = 7
+percentage = .50
 
 def BitMap(Image: np.ndarray) -> np.ndarray:
 
@@ -58,7 +58,7 @@ for font in os.listdir(characters_path):
 
             img_path = os.path.join(font_path,char)
             Image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            Image = cv2.resize(Image, (108,108),interpolation=cv2.INTER_NEAREST)
+            Image = cv2.resize(Image, (98,98),interpolation=cv2.INTER_NEAREST)
 
             bit_map = BitMap(Image)
             

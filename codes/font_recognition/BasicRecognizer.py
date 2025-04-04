@@ -3,8 +3,9 @@ import numpy as np
 import cv2 
 import time as t
 
-bits = 6
-percentage = .25
+bits = 7
+percentage = .50
+
 
 class FeatureNode:
     
@@ -203,7 +204,7 @@ class LetterRecognizer:
             blank_square = np.zeros((max_edge,max_edge), dtype=np.uint8)
             blank_square[starting_y:ending_y , starting_x:ending_x] = img
             
-            blank_square = cv2.resize(blank_square, (108,108), cv2.INTER_NEAREST)
+            blank_square = cv2.resize(blank_square, (100,100), cv2.INTER_NEAREST)
             
             self.LettersSquared.append([blank_square, (x,y)])
 
@@ -274,7 +275,7 @@ def ContentsToBitmap(contents):
     #print(f"bit maps: {bit_maps}")
     return bit_maps
 
-Image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\fonts\arial\all_chars.png")
+Image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\FinalDesicion\test_text.jpg")
 
 fonts = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bitmaps"
 
@@ -283,6 +284,32 @@ extractor.ContourExtraction()
 
 recognizer = LetterRecognizer(extractor.Letters)
 
+
+def OneByOne(bit__map):
+    arial = os.path.join(fonts,"arial.txt")
+
+    with open(arial,"r") as f:
+        contents = f.read().split("\n")
+    
+    bitmaps = ContentsToBitmap(contents)
+
+    for bitmap in bitmaps:
+        name = bitmap[0]
+        bit_map = bitmap[1]
+        counter = 0
+        for index, bit in enumerate(bit_map):
+            if str(bit__map[index]) == bit:
+                counter += 1
+        print(f"{name} Percentage: {(counter/(bits**2))*100}%")
+
+"""
+for index, bit_vector in enumerate(recognizer.bit_vectors):
+    OneByOne(bit_vector[0])
+
+    cv2.imshow("lala",recognizer.LettersSquared[index][0])
+    cv2.waitKey(0)
+
+quit(1)"""
 agac = Tree(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bitmaps\arial.txt")
 
 for index, letter in enumerate(recognizer.bit_vectors):

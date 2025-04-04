@@ -51,4 +51,3 @@ for font_name in os.listdir(fonts_path):
 
     for i, char in enumerate(char_images):
         cv.imwrite(f"{font_path}\{i}.png", char)
-        #cv.imwrite(f"{font_path}\{i}_contour.png", only_contours[i])
