@@ -275,7 +275,7 @@ def ContentsToBitmap(contents):
     #print(f"bit maps: {bit_maps}")
     return bit_maps
 
-Image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\FinalDesicion\test_text.jpg")
+Image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\test_case.jpg")
 
 fonts = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bitmaps"
 
@@ -292,6 +292,8 @@ def OneByOne(bit__map):
         contents = f.read().split("\n")
     
     bitmaps = ContentsToBitmap(contents)
+    biggest = ["name",0]
+    softmax_values = []
 
     for bitmap in bitmaps:
         name = bitmap[0]
@@ -300,16 +302,43 @@ def OneByOne(bit__map):
         for index, bit in enumerate(bit_map):
             if str(bit__map[index]) == bit:
                 counter += 1
-        print(f"{name} Percentage: {(counter/(bits**2))*100}%")
+            else:
+                counter -= 1
+        
+        softmax = np.exp(counter)
+        softmax_values.append([name,softmax])
 
-"""
+        """Percentage = ((counter)/(bits**2))*100
+
+        if Percentage > biggest[1]:
+            biggest = [name,Percentage]"""
+
+    for softmax in softmax_values:
+        name = softmax[0]
+        value = softmax[1]
+
+        values = [item[1] for item in softmax_values]
+
+        percentage = (value/sum(values))*100
+        percentage = np.clip(percentage, 1e-4, 100 - 1e-4)
+        
+        if percentage > biggest[1]:
+            biggest = [name,percentage]
+        
+
+        print(f"{name} Percentage: {percentage:.2f}%")
+
+    print(f"\n\nCHAR IS: {biggest}")
+
+
 for index, bit_vector in enumerate(recognizer.bit_vectors):
     OneByOne(bit_vector[0])
 
     cv2.imshow("lala",recognizer.LettersSquared[index][0])
     cv2.waitKey(0)
 
-quit(1)"""
+quit(1)
+
 agac = Tree(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\bitmaps\arial.txt")
 
 for index, letter in enumerate(recognizer.bit_vectors):
