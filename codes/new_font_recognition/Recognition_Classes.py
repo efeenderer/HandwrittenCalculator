@@ -15,8 +15,8 @@ class Extractor:
     
     def Extraction(self):
 
-        _,thresh_img = cv2.threshold(self.img, 0,255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        IMAGE_Y,IMAGE_X = thresh_img.shape[:2]
+        _,thresh_img = cv2.threshold(self.img, 127,255, cv2.THRESH_BINARY_INV) #+ cv2.THRESH_OTSU)
+        #IMAGE_Y,IMAGE_X = thresh_img.shape[:2]
         contours , _ = cv2.findContours(thresh_img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
         self.characterContours = list()
@@ -96,6 +96,48 @@ class Extractor:
                 cv2.imwrite(f"{save_path}\\{i}.jpg",image)
             except Exception as e:
                 print(f"There was an error saving number {i} :::: {e}")
+
+class RecognitionSquarer:
+    
+    def __init__(self, characterImages):
+        self.characterImages = characterImages
+        self.characterSquares = []
+        self.biggestLength = 0
+        self.Squarer()
+
+    
+    def Squarer(self):
+
+        for img, coordinates in self.characterImages:
+            height, width = img.shape[:2]
+
+            if max(height,width) > self.biggestLength:
+                self.biggestLength = max(height,width)
+            
+            #print(f"height: {height} width: {width}     Biggest So far: {self.biggestLength}")
+            
+        for img, coordinates in self.characterImages:
+            height, width = img.shape[:2]
+
+            img_edge = max(height,width)
+
+            max_edge = img_edge                                    #self.biggestLength
+
+            x1,x2 = int( (max_edge - height) / 2 ), int( (max_edge + height) / 2 )
+            y1,y2 = int( (max_edge - width) / 2 ), int( (max_edge + width) / 2 )
+            
+
+            blank_image = np.zeros((max_edge,max_edge), dtype=np.uint8)
+
+            blank_image[x1:x2,y1:y2] = img
+
+            IMAGE = blank_image
+            self.characterSquares.append([IMAGE,coordinates])
+
+    def ShowImages(self):
+        for image,coordinates in self.characterSquares:
+            cv2.imshow("lala", image)
+            cv2.waitKey(0)
 
 class Squarer:
 
@@ -178,7 +220,7 @@ class BitMap:
                             white_counter += 1
 
 
-                if (white_counter/(step_size**2)) >= 0.35:
+                if (white_counter/(step_size**2)) >= 0.30:          #PERCENTAGE OF WHITE PIXELS
                     self.bitmap[bitmap_index] = 1
         
     def ShowBitMap(self):
@@ -218,13 +260,13 @@ class FontBitMaps:
             self.CreateBitMaps()
     
     def AreAllBitmapsUnique(self):
-        tolarence = 0
+        tolerance = 0
         bitmap_amount = len(self.bit_maps)
         for i in range(bitmap_amount):
             for j in range(i+1, bitmap_amount):
                 if np.array_equal(self.bit_maps[i][0].getBitmap(), self.bit_maps[j][0].getBitmap()):
-                    tolarence += 1
-                    if tolarence >= 2:  return False
+                    tolerance += 1
+                    if tolerance >= 2:  return False
         return True
     
     def SaveBitmaps(self,save_path):

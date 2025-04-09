@@ -19,7 +19,7 @@ numbers_square_images_save_path = r"E:\Python_Projeler\ComputerVisionProjects\Fi
 
 lowercase_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\arial_lowercase.json" 
 uppercase_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\bitmaps\arial_uppercase.json" 
-nuumbers_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\bitmaps\arial_numbers.json" 
+numbers_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\bitmaps\arial_numbers.json" 
 
 #lowercase_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\squared_images"
 #uppercase_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\squared_images"
@@ -28,6 +28,7 @@ nuumbers_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject
 
 pure_character_images = []
 
+print("UPPERCASE")
 for image_name_jpg in os.listdir(uppercase_characters_path):
     image_path = os.path.join(uppercase_characters_path,image_name_jpg)
     image_name = image_name_jpg.split(".")[0]
@@ -37,11 +38,12 @@ for image_name_jpg in os.listdir(uppercase_characters_path):
 
 SQUARER = Squarer(pure_character_images)
 
-
 uppercase_bitmaps = FontBitMaps(SQUARER.characterSquares,5)
 uppercase_bitmaps.SaveBitmaps(uppercase_bitmaps_path)
+ 
 
 
+print("LOWERCASE")
 pure_character_images = []
 
 for image_name_jpg in os.listdir(lowercase_characters_path):
@@ -53,9 +55,23 @@ for image_name_jpg in os.listdir(lowercase_characters_path):
 
 SQUARER = Squarer(pure_character_images)
 
-
 lowercase_bitmaps = FontBitMaps(SQUARER.characterSquares,5)
 lowercase_bitmaps.SaveBitmaps(lowercase_bitmaps_path)
 
-uppercase_bit_size = 5
-lowercase_bit_size = 6  #Based on trials
+
+print("NUMBERS")
+
+pure_character_images = []
+
+
+for image_name_jpg in os.listdir(numbers_characters_path):
+    image_path = os.path.join(numbers_characters_path,image_name_jpg)
+    image_name = image_name_jpg.split(".")[0]
+    image = cv2.imread(image_path,cv2.IMREAD_GRAYSCALE)
+
+    pure_character_images.append([image,(0,0),image_name])
+
+SQUARER = Squarer(pure_character_images)
+
+numbers_bitmaps = FontBitMaps(SQUARER.characterSquares,6)
+numbers_bitmaps.SaveBitmaps(numbers_bitmaps_path)
