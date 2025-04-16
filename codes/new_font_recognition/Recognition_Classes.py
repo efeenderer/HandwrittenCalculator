@@ -259,12 +259,16 @@ class FontBitMaps:
             print(f"Some BitMaps are repeated at bit size of {self.bit-1}.\nNew bit size: {self.bit}")
             self.CreateBitMaps()
     
-    def AreAllBitmapsUnique(self):
-        tolerance = 0
+    def AreAllBitmapsUnique(self, tolerance = 0):
+        
         bitmap_amount = len(self.bit_maps)
         for i in range(bitmap_amount):
             for j in range(i+1, bitmap_amount):
                 if np.array_equal(self.bit_maps[i][0].getBitmap(), self.bit_maps[j][0].getBitmap()):
+
+                    if "line" in self.bit_maps[i][2] and "line" in self.bit_maps[j][2] or "dot" in self.bit_maps[i][2] and "dot" in self.bit_maps[j][2]:
+                        continue
+
                     tolerance += 1
                     if tolerance >= 2:  return False
         return True

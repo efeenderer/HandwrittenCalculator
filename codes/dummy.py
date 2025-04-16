@@ -3,70 +3,51 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 
-bitmap1 = ['0','0','0','3','0','0','0','0','0','0']
-bitmap2 = ['0','0','0','0','0','0','0','0','0','0']
-bitmap3 = ['0','0','0','0','0','0','0','0','0','0']
 
-if bitmap3 == bitmap1:
-    print("Ender")
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+    def Print(self):
+        if self.next is not None:
+            print(f"{self.val} ",end="")
+            self.next.Print()
+        else:
+            print(f"{self.val}",end="")
 
 
-"""
-images_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests"
-
-for images in os.listdir(images_path):
-    
-    if images.split(".")[-1] in ["png","jpg","jpeg","webp"]:
+class Solution:
+    def addTwoNumbers(self, l1, l2):
+        number_l1_reverse = ""
+        number_l2_reverse = ""
         
-        image_name = images.split(".")[-2]
+        currentList_1 = l1
+        while currentList_1 is not None:
+            number_l1_reverse += str(currentList_1.val)
+            currentList_1 = currentList_1.next
 
-        print(image_name)
+        currentList_2 = l2
+        while currentList_2 is not None:
+            number_l2_reverse += str(currentList_2.val)
+            currentList_2 = currentList_2.next
 
-        image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests"+f"\\{images}")
+        number_l1 = number_l1_reverse[::-1]
+        number_l2 = number_l2_reverse[::-1]
 
-        save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests\Tests"+f"\\{image_name}"
+        new_number = str(int(number_l2) + int(number_l1))
 
-        os.makedirs(save_path, exist_ok=True)
 
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        cv2.imwrite(f"{save_path}\\gray.png", gray)
-
-        blur = cv2.GaussianBlur(gray, (3,3), 0)
-        cv2.imwrite(f"{save_path}\\blur.png", blur)
-
-        _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        cv2.imwrite(f"{save_path}\\thresh.png", thresh)
-
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        #print(f"Contours is this: {contours}")
-        #print(f"A single contour: {contours[0]}")
-        #print(f"Its type is: {type(contours[0])}")
+        previousNode = None
         
-        char_images = []
-        only_contours = []
-        for contour in contours:
+        for digit in new_number:
 
-            min_x = min(point[0][0] for point in contour)
-            max_x = max(point[0][0] for point in contour)
-            min_y = min(point[0][1] for point in contour)
-            max_y = max(point[0][1] for point in contour)
+            currentNode = ListNode(digit, previousNode)
 
-            contour_image_width = max_x - min_x + 1
-            contour_image_height = max_y - min_y + 1
-            contour_image = np.zeros((contour_image_height, contour_image_width), dtype=np.uint8)
+            previousNode = currentNode
+        
+        return currentNode
 
-            for point in contour:
-                x, y = point[0]
-                contour_image[y - min_y, x - min_x] = 255
 
-            x, y, w, h = cv2.boundingRect(contour)
-            char = thresh[y:y+h, x:x+w]
-
-            char_images.append(char)
-            only_contours.append(contour_image)
-
-        for i, char in enumerate(char_images):
-            cv2.imwrite(f"{save_path}\{i}_cut.png", char)
-            cv2.imwrite(f"{save_path}\{i}_contour.png", only_contours[i])
-"""
+A = 15
+print(A//10)
