@@ -1,7 +1,7 @@
 from Recognition_Classes import *
 
 uppercase_bit_size = 5
-lowercase_bit_size = 6  #Based on trials
+lowercase_bit_size = 5  #Based on trials
 numbers_bit_size = 6
 lower_operator_number_bit_size = 6
 
@@ -116,17 +116,95 @@ def ToStringLowercase(uppercase_letters_list,tolerance = 15):
         print()
 
 
+def ConvertToMathString(recognized_characters, tolerance=10):
+    """
+    recognized_characters: List of elements in format: [[char, confidence], (x, y)]
+    Returns: Reconstructed math expression string
+    """
+
+    import numpy as np
+
+    if not recognized_characters:
+        return ""
+
+    # Ayıralım: h_line'ları ve normal karakterleri
+    h_lines = []
+    others = []
+
+    for (char_data, coord) in recognized_characters:
+        char, _ = char_data
+        if char == "h_line" or char == "division":
+            h_lines.append((char_data, coord))
+        else:
+            others.append((char_data, coord))
+
+    # Eğer hiç h_line yoksa, sadece x sırasına göre sırala ve döndür
+    if not h_lines:
+        others.sort(key=lambda item: item[1][0])
+        return "".join([char_data[0] for char_data, _ in others])
+
+    result_parts = []
+    used = set()
+
+    for (hl_char_data, hl_coord) in h_lines:
+        hl_x, hl_y = hl_coord
+
+        numerator = []
+        denominator = []
+        on_line = []
+
+        for idx, (char_data, coord) in enumerate(others):
+            x, y = coord
+            if abs(x - hl_x) <= 50:
+                if y < hl_y - tolerance:
+                    numerator.append((char_data, coord))
+                    used.add(idx)
+                elif y > hl_y + tolerance:
+                    denominator.append((char_data, coord))
+                    used.add(idx)
+                elif abs(y - hl_y) <= tolerance:
+                    on_line.append((char_data, coord))
+                    used.add(idx)
+
+        # Sırala
+        numerator.sort(key=lambda item: item[1][0])
+        denominator.sort(key=lambda item: item[1][0])
+        on_line.sort(key=lambda item: item[1][0])
+
+
+        num_str = "".join([char_data[0] for char_data, _ in numerator])
+        den_str = "".join([char_data[0] for char_data, _ in denominator])
+        mid_str = "".join([char_data[0] for char_data, _ in on_line])
+
+
+
+        if num_str or den_str:
+            result_parts.append(f"({num_str})/({den_str})")
+        else:
+            result_parts.append(mid_str)
+            
+    unused = [
+        (char_data, coord)
+        for idx, (char_data, coord) in enumerate(others)
+        if idx not in used
+    ]
+    unused.sort(key=lambda item: item[1][0])
+    unused_str = "".join([char_data[0] for char_data, _ in unused])
+
+    return unused_str + "".join(result_parts)
+
+
 
 uppercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\bitmaps\arial_uppercase.json"
-lowercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\arial_lowercase.json"
+lowercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\el_yazisi_lowercase.json"
 numbers_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\bitmaps\arial_numbers.json"
 lower_operator_number_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lower_operator_number\bitmaps\arial_lower_operator_number.json"
 
 
 uppercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\uppercase\uppercase_test.jpg"
-lowercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lowercase\lowercase_test.jpg"
+lowercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\el_yazisi_test_1.jpg"
 numbers_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\numbers\numbers_test.jpg"
-lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\lower_operator_number_test.jpg"
+lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\el_yazisi_test_1.jpg"
 
 
 uppercase_extraction = Extractor(uppercase_recognition_test_image_path)
@@ -138,7 +216,8 @@ lowercase_squarer = RecognitionSquarer(lowercase_extraction.characterImages)
 numbers_extraction = Extractor(numbers_recognition_test_image_path)
 numbers_squarer = RecognitionSquarer(numbers_extraction.characterImages)
 
-lower_operator_number_extraction = Extractor(numbers_recognition_test_image_path)
+
+lower_operator_number_extraction = Extractor(lower_operator_number_test_image_path)
 lower_operator_number_squarer = RecognitionSquarer(lower_operator_number_extraction.characterImages)
 
 uppercase_letters_list = []
@@ -151,16 +230,25 @@ for lower_operator_number_image, lower_operator_number_coordinates in lower_oper
     bitmap_object = BitMap(lower_operator_number_image,lower_operator_number_bit_size)
     recognition = ManhattanLike(bitmap_object, lower_operator_number_bitmap_path)
     lower_operator_number_list.append([recognition, lower_operator_number_coordinates])
-    print([recognition, lower_operator_number_coordinates])
+
+
+for lowercase_letter_image, lowercase_letter_coordinates in lowercase_squarer.characterSquares:
+
     
+    bitmap_object = BitMap(lowercase_letter_image,lowercase_bit_size)
+
+    recognition = ManhattanLike(bitmap_object, lowercase_recognition_font_bitmap_path)
+    lowercase_letters_list.append( [ recognition , lowercase_letter_coordinates ] )
+    
+    print([recognition, lowercase_letter_coordinates])
+    cv2.imshow("ll", lowercase_letter_image)
+    cv2.waitKey(1000)
 
 
 
 
 
-
-
-
+r"""
 
 quit(1)
 
@@ -198,4 +286,4 @@ ToStringLowercase(lowercase_letters_list)
 
 
 print("\nNUMBERS TESTS\n")
-ToString(numbers_letters_list)
+ToString(numbers_letters_list)"""

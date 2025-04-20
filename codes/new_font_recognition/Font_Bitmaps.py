@@ -1,7 +1,7 @@
 from Recognition_Classes import * 
 
 #uppercase_extraction = Extractor(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\characters\all_characters.jpg")
-#lowercase_extraction = Extractor(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\characters\all_characters.jpg")
+#lowercase_extraction = Extractor(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\characters\all_characters_2.jpg")
 #numbers_extraction = Extractor(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\characters\all_characters.jpg")
 
 #uppercase_extraction.SaveExtraction()
@@ -18,7 +18,7 @@ lowercase_square_image_save_path = r"E:\Python_Projeler\ComputerVisionProjects\F
 uppercase_square_images_save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\squared_images"
 numbers_square_images_save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\squared_images"
 
-lowercase_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\arial_lowercase.json" 
+lowercase_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\el_yazisi_lowercase.json" 
 uppercase_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\bitmaps\arial_uppercase.json" 
 numbers_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\bitmaps\arial_numbers.json"
 lower_operator_number_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lower_operator_number\bitmaps\arial_lower_operator_number.json"
