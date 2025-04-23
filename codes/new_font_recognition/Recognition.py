@@ -1,9 +1,34 @@
+from typing import List
 from Recognition_Classes import *
 
-uppercase_bit_size = 5
-lowercase_bit_size = 5  #Based on trials
+uppercase_bit_size = 6
+lowercase_bit_size = 6  #Based on trials
 numbers_bit_size = 6
 lower_operator_number_bit_size = 6
+
+
+r"""
+uppercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\bitmaps\arial_uppercase.json"
+lowercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\el_yazisi_lowercase.json"
+numbers_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\bitmaps\arial_numbers.json"
+
+
+uppercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\uppercase\uppercase_test.jpg"
+lowercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\el_yazisi_test_1.jpg"
+numbers_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\numbers\numbers_test.jpg"
+
+
+uppercase_extraction = Extractor(uppercase_recognition_test_image_path)
+uppercase_squarer = RecognitionSquarer(uppercase_extraction.characterImages)
+
+lowercase_extraction = Extractor(lowercase_recognition_test_image_path)
+lowercase_squarer = RecognitionSquarer(lowercase_extraction.characterImages)
+
+numbers_extraction = Extractor(numbers_recognition_test_image_path)
+numbers_squarer = RecognitionSquarer(numbers_extraction.characterImages)
+
+"""
+
 
 def ManhattanLike(image_bitmap_object, font_bitmap_path):
 
@@ -20,7 +45,7 @@ def ManhattanLike(image_bitmap_object, font_bitmap_path):
 
         font_letter_bitmap = np.array(data[font_letter_data]["bitmap"])
         #print(f"type of image_bitmap: {(image_bitmap)}    type fof font: {(font_letter_bitmap)}")
-        difference = np.where(font_letter_bitmap == image_bitmap,1,-1)
+        difference = np.where(font_letter_bitmap == image_bitmap,1,0)
         result = np.sum(difference)
         results.append([font_letter_data,result])
 
@@ -34,6 +59,80 @@ def ManhattanLike(image_bitmap_object, font_bitmap_path):
             best = [result[0],percentage]
 
     return best
+
+def sort_symbols_left_to_right(symbols):
+    return sorted(symbols, key=lambda s: s[1][0])  # sort by x_center
+
+def is_superscript(base, candidate):
+    # candidate üstte ve küçükse üstsimgedir
+    _, (bx, by), (bw, bh) = base
+    _, (cx, cy), (cw, ch) = candidate
+    return (cy + ch) < by and ch < bh * 0.8 and abs(cx - bx) < bw * 1.2
+
+def get_neighbors(line, symbols, direction='above'):
+    lx, ly = line[1]
+    lw, lh = line[2]
+    xmin, xmax = lx - lw * 0.1, lx + lw * 1.1
+    results = []
+    for sym in symbols:
+        if sym == line:
+            continue
+        cx, cy = sym[1]
+        cw, ch = sym[2]
+        cx_center = cx
+        in_x_range = xmin <= cx_center <= xmax
+        if direction == 'above':
+            if in_x_range and cy + ch < ly and abs(cy + ch - ly) < lh * 4:
+                results.append(sym)
+        else:
+            if in_x_range and cy > ly + lh and abs(cy - (ly + lh)) < lh * 4:
+                results.append(sym)
+    return sorted(results, key=lambda s: s[1][0])  # sort by x_center
+
+def build_expression(symbols):
+    expr = ""
+    i = 0
+    symbols = sort_symbols_left_to_right(symbols)
+    
+    while i < len(symbols):
+        current = symbols[i]
+        char_label = current[0][0]
+
+        if 'h_line' in char_label:
+            above = get_neighbors(current, symbols, 'above')
+            below = get_neighbors(current, symbols, 'below')
+            
+            if above and below:
+                above_expr = build_expression(above)
+                below_expr = build_expression(below)
+                expr += f"({above_expr})/({below_expr})"
+                # Bu sembolleri atlıyoruz:
+                skip = set([tuple(s) for s in above + below + [current]])
+                symbols = [s for s in symbols if tuple(s) not in skip]
+                i = 0
+                continue
+            else:
+                expr += "-"  # yalnız bir çizgiyse eksi olarak algıla
+
+        else:
+            # Superscript kontrolü
+            superscripts = [s for s in symbols if is_superscript(current, s)]
+            if superscripts:
+                # En yakın üstü al
+                superscript_expr = build_expression(superscripts)
+                expr += f"{char_label}^({superscript_expr})"
+                skip = set([tuple(s) for s in superscripts])
+                symbols = [s for s in symbols if tuple(s) not in skip]
+                i += 1
+                continue
+            else:
+                expr += char_label
+        
+        i += 1
+
+    return expr
+
+
 
 
 def ToString(uppercase_letters_list,tolerance = 10):
@@ -75,7 +174,6 @@ def ToString(uppercase_letters_list,tolerance = 10):
             print(letter,end=" ")
         print()
 
-
 def ToStringLowercase(uppercase_letters_list,tolerance = 15):
     y_values = set()
     groups = []
@@ -116,122 +214,38 @@ def ToStringLowercase(uppercase_letters_list,tolerance = 15):
         print()
 
 
-def ConvertToMathString(recognized_characters, tolerance=10):
-    """
-    recognized_characters: List of elements in format: [[char, confidence], (x, y)]
-    Returns: Reconstructed math expression string
-    """
 
-    import numpy as np
+lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\math_test_1.jpg"
 
-    if not recognized_characters:
-        return ""
-
-    # Ayıralım: h_line'ları ve normal karakterleri
-    h_lines = []
-    others = []
-
-    for (char_data, coord) in recognized_characters:
-        char, _ = char_data
-        if char == "h_line" or char == "division":
-            h_lines.append((char_data, coord))
-        else:
-            others.append((char_data, coord))
-
-    # Eğer hiç h_line yoksa, sadece x sırasına göre sırala ve döndür
-    if not h_lines:
-        others.sort(key=lambda item: item[1][0])
-        return "".join([char_data[0] for char_data, _ in others])
-
-    result_parts = []
-    used = set()
-
-    for (hl_char_data, hl_coord) in h_lines:
-        hl_x, hl_y = hl_coord
-
-        numerator = []
-        denominator = []
-        on_line = []
-
-        for idx, (char_data, coord) in enumerate(others):
-            x, y = coord
-            if abs(x - hl_x) <= 50:
-                if y < hl_y - tolerance:
-                    numerator.append((char_data, coord))
-                    used.add(idx)
-                elif y > hl_y + tolerance:
-                    denominator.append((char_data, coord))
-                    used.add(idx)
-                elif abs(y - hl_y) <= tolerance:
-                    on_line.append((char_data, coord))
-                    used.add(idx)
-
-        # Sırala
-        numerator.sort(key=lambda item: item[1][0])
-        denominator.sort(key=lambda item: item[1][0])
-        on_line.sort(key=lambda item: item[1][0])
-
-
-        num_str = "".join([char_data[0] for char_data, _ in numerator])
-        den_str = "".join([char_data[0] for char_data, _ in denominator])
-        mid_str = "".join([char_data[0] for char_data, _ in on_line])
-
-
-
-        if num_str or den_str:
-            result_parts.append(f"({num_str})/({den_str})")
-        else:
-            result_parts.append(mid_str)
-            
-    unused = [
-        (char_data, coord)
-        for idx, (char_data, coord) in enumerate(others)
-        if idx not in used
-    ]
-    unused.sort(key=lambda item: item[1][0])
-    unused_str = "".join([char_data[0] for char_data, _ in unused])
-
-    return unused_str + "".join(result_parts)
-
-
-
-uppercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\uppercase\bitmaps\arial_uppercase.json"
-lowercase_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lowercase\bitmaps\el_yazisi_lowercase.json"
-numbers_recognition_font_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\numbers\bitmaps\arial_numbers.json"
 lower_operator_number_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lower_operator_number\bitmaps\arial_lower_operator_number.json"
-
-
-uppercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\uppercase\uppercase_test.jpg"
-lowercase_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\el_yazisi_test_1.jpg"
-numbers_recognition_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\numbers\numbers_test.jpg"
-lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\el_yazisi_test_1.jpg"
-
-
-uppercase_extraction = Extractor(uppercase_recognition_test_image_path)
-uppercase_squarer = RecognitionSquarer(uppercase_extraction.characterImages)
-
-lowercase_extraction = Extractor(lowercase_recognition_test_image_path)
-lowercase_squarer = RecognitionSquarer(lowercase_extraction.characterImages)
-
-numbers_extraction = Extractor(numbers_recognition_test_image_path)
-numbers_squarer = RecognitionSquarer(numbers_extraction.characterImages)
-
 
 lower_operator_number_extraction = Extractor(lower_operator_number_test_image_path)
 lower_operator_number_squarer = RecognitionSquarer(lower_operator_number_extraction.characterImages)
+
 
 uppercase_letters_list = []
 lowercase_letters_list = []
 numbers_letters_list = []
 lower_operator_number_list = []
 
-for lower_operator_number_image, lower_operator_number_coordinates in lower_operator_number_squarer.characterSquares:
+for lower_operator_number_image, lower_operator_number_coordinates, lower_operator_number_sizes in lower_operator_number_squarer.characterSquares:
     
     bitmap_object = BitMap(lower_operator_number_image,lower_operator_number_bit_size)
     recognition = ManhattanLike(bitmap_object, lower_operator_number_bitmap_path)
     lower_operator_number_list.append([recognition, lower_operator_number_coordinates])
 
+    
+    print(f"{[recognition, lower_operator_number_coordinates, lower_operator_number_sizes]}")
+    cv2.namedWindow("lala", cv2.WINDOW_FREERATIO)
+    cv2.imshow("lala",lower_operator_number_image)
+    cv2.waitKey(0)
 
+
+
+
+
+
+r"""
 for lowercase_letter_image, lowercase_letter_coordinates in lowercase_squarer.characterSquares:
 
     
@@ -243,15 +257,6 @@ for lowercase_letter_image, lowercase_letter_coordinates in lowercase_squarer.ch
     print([recognition, lowercase_letter_coordinates])
     cv2.imshow("ll", lowercase_letter_image)
     cv2.waitKey(1000)
-
-
-
-
-
-r"""
-
-quit(1)
-
 
 for uppercase_letter_image, uppercase_letter_coordinates in uppercase_squarer.characterSquares:
 

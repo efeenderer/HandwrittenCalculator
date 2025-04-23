@@ -35,6 +35,8 @@ lower_operator_number_bitmaps_path = r"E:\Python_Projeler\ComputerVisionProjects
 
 pure_character_images = []
 
+min_bit = 6
+
 print("UPPERCASE")
 for image_name_jpg in os.listdir(uppercase_characters_path):
     image_path = os.path.join(uppercase_characters_path,image_name_jpg)
@@ -45,7 +47,7 @@ for image_name_jpg in os.listdir(uppercase_characters_path):
 
 SQUARER = Squarer(pure_character_images)
 
-uppercase_bitmaps = FontBitMaps(SQUARER.characterSquares,5)
+uppercase_bitmaps = FontBitMaps(SQUARER.characterSquares,min_bit)
 uppercase_bitmaps.SaveBitmaps(uppercase_bitmaps_path)
  
 
@@ -62,7 +64,7 @@ for image_name_jpg in os.listdir(lowercase_characters_path):
 
 SQUARER = Squarer(pure_character_images)
 
-lowercase_bitmaps = FontBitMaps(SQUARER.characterSquares,5)
+lowercase_bitmaps = FontBitMaps(SQUARER.characterSquares,min_bit)
 lowercase_bitmaps.SaveBitmaps(lowercase_bitmaps_path)
 
 
@@ -98,5 +100,5 @@ for image_name_jpg in os.listdir(lower_operator_number_characters_path):
 
 SQUARER = Squarer(pure_character_images)
 
-lower_operator_number_bitmaps = FontBitMaps(SQUARER.characterSquares,5)
+lower_operator_number_bitmaps = FontBitMaps(SQUARER.characterSquares,min_bit)
 lower_operator_number_bitmaps.SaveBitmaps(lower_operator_number_bitmaps_path)

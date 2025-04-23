@@ -132,7 +132,13 @@ class RecognitionSquarer:
             blank_image[x1:x2,y1:y2] = img
 
             IMAGE = blank_image
-            self.characterSquares.append([IMAGE,coordinates])
+
+            x, y = coordinates
+
+            x_center = (x + width)//2
+            y_center = (y + height)//2
+            
+            self.characterSquares.append([IMAGE,(x_center,y_center),(height,width)])
 
     def ShowImages(self):
         for image,coordinates in self.characterSquares:
@@ -236,6 +242,7 @@ class BitMap:
         cv2.waitKey(0)
 
 class FontBitMaps:
+
     def __init__(self, images, StarterBit):
 
         self.characterImages = images
@@ -284,3 +291,19 @@ class FontBitMaps:
             }
         with open(save_path,"w") as F:
             json.dump(json_data,F,indent=3)
+
+class Symbol:
+    def __init__(self,char,confidence,center,size):
+        self.char = char
+        self.confidence = confidence
+        self.x, self.y = center
+        self.w, self.h = size
+
+    def isLine(self):
+        return "line" in self.char
+    
+    def __repr__(self): 
+        return f"Symbol('{self.char}', ({self.x}, {self.y}), {self.w}x{self.h})"
+
+
+        
