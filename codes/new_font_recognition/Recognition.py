@@ -154,6 +154,94 @@ def ManhattanLike(image_bitmap_object, font_bitmap_path):
 
     return best
 
+def SortByX(symbols: List[Symbol]):
+
+    return sorted(symbols, key=lambda s: s.x)
+
+def ProcessLine(symbols: List[Symbol]):
+    symbols = SortByX(symbols)
+
+    result = ""
+
+    for s in symbols:
+        result += s.char
+
+    return result
+
+def ProcessDivision(div_symbol, above, below, tolerance = 50):
+    results = []
+    above = []
+    below = []
+
+    div_x = div_symbol.x
+    div_w = div_symbol.w
+    div_y = div_symbol.y
+    div_h = div_symbol.h
+
+    highest = float('inf')
+    lowest = float("-inf")
+
+    for s in symbols:
+        if s is div_symbol:     continue
+        
+        highest = min(s.y,highest)
+        lowest = max(s.y, lowest)
+
+        isAbove = div_y > s.y
+        isBelow = div_y < s.y
+
+        if isAbove:     above.append(s)
+        elif isBelow:   below.append(s)
+    
+    print(f"Above: {above}")
+    print(f"Above: {below}")
+
+    return Symbol(f"( {ProcessLine(above)} ) / ( {ProcessLine(below)} )", center=(div_x,div_y), size= (div_w, (lowest - highest) ) )
+
+def Process(symbols, tolerance = 50):
+
+    symbols_x_sorted = SortByX(symbols)
+    new_symbols = []
+    i = 0
+    
+    while i < len(symbols_x_sorted):
+        s = symbols_x_sorted[i]
+
+        if "division" in s.char or "h_line" in s.char:
+            div_left = s.x - s.w//2 - tolerance
+            div_right = s.x + s.w//2 + tolerance
+            
+            above = []
+            below = []
+
+            for s2 in symbols: 
+                if s2 is s:
+                    continue
+                isItIn = div_left <= s2.x <= div_right
+                if not isItIn:
+                    continue
+                if s2.y < s.y:
+                    above.append(s2)
+                elif s2.y > s.y:
+                    below.append(s2)
+            
+            used = set(above+below +[s])
+
+            new_symbol = ProcessDivision(s,above,below)
+            new_symbols.append(new_symbol)
+
+            symbols_x_sorted = [s3 for s3 in symbols_x_sorted if s3 not in used]
+            i = 0
+
+        else:
+            new_symbols.append(s)
+            i += 1
+
+                
+
+
+    
+
 
 
 lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\math_test_1.jpg"
@@ -172,4 +260,36 @@ for lower_operator_number_image, lower_operator_number_coordinates, lower_operat
     
     bitmap_object = BitMap(lower_operator_number_image,lower_operator_number_bit_size)
     recognition = ManhattanLike(bitmap_object, lower_operator_number_bitmap_path)
-    symbols.append( Symbol( recognition[0], recognition[1], lower_operator_number_coordinates, lower_operator_number_sizes ) )
+    symbol = Symbol( recognition[0], recognition[1], lower_operator_number_coordinates, lower_operator_number_sizes )
+
+    symbols.append( symbol )
+
+
+
+for index, s in enumerate(symbols):
+    if "division" in s.char or "h_line" in s.char:
+        break
+
+print(ProcessDivision(symbols[index], symbols))
+
+
+
+
+
+
+
+empty = np.ones((813,908), dtype=np.uint8) * 255  
+
+def Circle(x, y, radius=15):
+    cv2.circle(empty, (x, y), radius, (0,), thickness=-1) 
+
+for s in symbols:
+    if "h_line" in s.char or "division" in s.char:
+        Circle(s.x + s.w//2, s.y,5)
+        Circle(s.x - s.w//2, s.y,5)
+    Circle(s.x, s.y)
+
+cv2.namedWindow("lala", cv2.WINDOW_FREERATIO)
+cv2.imshow("lala", empty)
+cv2.waitKey(0)
+cv2.destroyAllWindows()

@@ -135,10 +135,10 @@ class RecognitionSquarer:
 
             x, y = coordinates
 
-            x_center = (x + width)//2
-            y_center = (y + height)//2
+            x_center = x + width//2
+            y_center = y + height//2
             
-            self.characterSquares.append([IMAGE,(x_center,y_center),(height,width)])
+            self.characterSquares.append([IMAGE,(x_center,y_center),(width,height)])
 
     def ShowImages(self):
         for image,coordinates in self.characterSquares:
@@ -293,7 +293,7 @@ class FontBitMaps:
             json.dump(json_data,F,indent=3)
 
 class Symbol:
-    def __init__(self,char,confidence,center,size):
+    def __init__(self,char,confidence=None,center=None,size=None):
         self.char = char
         self.confidence = confidence
         self.x, self.y = center
