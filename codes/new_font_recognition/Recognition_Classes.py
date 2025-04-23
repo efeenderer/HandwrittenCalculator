@@ -298,12 +298,15 @@ class Symbol:
         self.confidence = confidence
         self.x, self.y = center
         self.w, self.h = size
+        self.used = False
 
     def isLine(self):
         return "line" in self.char
     
     def __repr__(self): 
         return f"Symbol('{self.char}', ({self.x}, {self.y}), {self.w}x{self.h})"
+    
+
 
 
         
