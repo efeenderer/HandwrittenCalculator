@@ -164,7 +164,7 @@ def ProcessLine(symbols: List[Symbol]):
     result = ""
 
     for s in symbols:
-        result += s.char
+        result += f"{s.char} "
 
     return result
 
@@ -184,7 +184,8 @@ def Process(symbols, tolerance = 50):
     symbols_x_sorted = SortByX(symbols)
     new_symbols = []
     i = 0
-    
+    used = set()
+
     while i < len(symbols_x_sorted):
         s = symbols_x_sorted[i]
 
@@ -215,17 +216,14 @@ def Process(symbols, tolerance = 50):
             i = 0
 
         else:
-            new_symbols.append(s)
             i += 1
 
+    for s in symbols_x_sorted:
+        print(f"Deneme: {s}")
+
+    return ProcessLine(new_symbols+symbols_x_sorted)
                 
-
-
-    
-
-
-
-lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\math_test_1.jpg"
+lower_operator_number_test_image_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\TEST\lower_operator_number\math_test_2.jpg"
 
 lower_operator_number_bitmap_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\new_font_recognition\lower_operator_number\bitmaps\arial_lower_operator_number.json"
 
@@ -251,7 +249,7 @@ for index, s in enumerate(symbols):
     if "division" in s.char or "h_line" in s.char:
         break
 
-print(ProcessDivision(symbols[index], symbols))
+print(Process(symbols))
 
 
 
@@ -259,7 +257,7 @@ print(ProcessDivision(symbols[index], symbols))
 
 
 
-empty = np.ones((813,908), dtype=np.uint8) * 255  
+empty = np.ones((813,2000), dtype=np.uint8) * 255  
 
 def Circle(x, y, radius=15):
     cv2.circle(empty, (x, y), radius, (0,), thickness=-1) 
