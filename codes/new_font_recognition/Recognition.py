@@ -169,34 +169,15 @@ def ProcessLine(symbols: List[Symbol]):
     return result
 
 def ProcessDivision(div_symbol, above, below, tolerance = 50):
-    results = []
-    above = []
-    below = []
+    above_line = ProcessLine(above)
+    below_line = ProcessLine(below)
 
-    div_x = div_symbol.x
-    div_w = div_symbol.w
-    div_y = div_symbol.y
-    div_h = div_symbol.h
+    result = f"({above_line}) / ({below_line})"
 
-    highest = float('inf')
-    lowest = float("-inf")
-
-    for s in symbols:
-        if s is div_symbol:     continue
-        
-        highest = min(s.y,highest)
-        lowest = max(s.y, lowest)
-
-        isAbove = div_y > s.y
-        isBelow = div_y < s.y
-
-        if isAbove:     above.append(s)
-        elif isBelow:   below.append(s)
+    return Symbol(result, confidence=100.0,center=(div_symbol.x, div_symbol.y), size=(div_symbol.w, div_symbol.h))
     
-    print(f"Above: {above}")
-    print(f"Above: {below}")
-
-    return Symbol(f"( {ProcessLine(above)} ) / ( {ProcessLine(below)} )", center=(div_x,div_y), size= (div_w, (lowest - highest) ) )
+    
+    
 
 def Process(symbols, tolerance = 50):
 

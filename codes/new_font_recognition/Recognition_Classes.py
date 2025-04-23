@@ -306,7 +306,17 @@ class Symbol:
     def __repr__(self): 
         return f"Symbol('{self.char}', ({self.x}, {self.y}), {self.w}x{self.h})"
     
+    def __eq__(self, other):
+        if not isinstance(other, Symbol):
+            return False
+        return (self.char, self.x, self.y, self.w, self.h) == (other.char, other.x, other.y, other.w, other.h)
 
+    def __hash__(self):
+        # Eğer __eq__'yi override ediyorsan, __hash__'i de buna uygun tanımlaman gerekir.
+        return hash((self.char, self.x, self.y, self.w, self.h))
+
+    def __repr__(self):
+        return f"Symbol('{self.char}', ({self.x}, {self.y}), {self.w}x{self.h})"
 
 
         
