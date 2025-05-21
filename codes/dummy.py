@@ -1,62 +1,60 @@
 import cv2
-import numpy as np
 import os
-import matplotlib.pyplot as plt
 
-images_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests"
+import numpy as np
 
-for images in os.listdir(images_path):
-    
-    if images.split(".")[-1] in ["png","jpg","jpeg","webp"]:
+letter_dict = {
+    '0001': 'a', '0002': 'b', '0003': 'c', '0004': 'd', '0005': 'e', '0006': 'f',
+    '0007': 'h', '0008': 'vertical_line', '0009': 'j', '0010': 'k', '0011': 'vertical_line',
+    '0012': 'm', '0013': 'n', '0014': 'o', '0015': 'p', '0016': 'q', '0017': 'r',
+    '0018': 's', '0019': 't', '0020': 'u', '0021': 'v', '0022': 'w', '0023': 'x',
+    '0024': 'y', '0025': 'z', '0026': '0', '0027': '1', '0028': '2', '0029': '3',
+    '0030': '4', '0031': '5', '0032': '6', '0033': '7', '0034': '8', '0035': '9',
+    '0036': 'plus', '0037': 'horizontal_line', '0038': 'slash',
+    '0039': 'paranthesis_left', '0040': 'paranthesis_right', '0041': 'sqrt', '0042': 'sqrt'}
+
+label_dict = {label: 0 for label in set(letter_dict.values())}
+
+def ExtractSet(path, save_path, name=None):
+    page = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    kernel = np.ones((4, 4), np.uint8)
+    blur = cv2.GaussianBlur(page, (3, 3), 1)
+    _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    dilation = cv2.dilate(thresh, kernel, iterations=2)
+    dilation_2 = cv2.dilate(thresh, kernel=np.ones((1, 1), np.uint8))  # Optional, may vary per dataset
+
+    contours, _ = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    for index, contour in enumerate(contours):
+        mask = np.zeros_like(dilation)
+        cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
+        MaskedLetter = cv2.bitwise_and(dilation_2, dilation_2, mask=mask)
+
+        if name is not None:
+            index = label_dict[name]
+            label_dict[name] = index + 1
+
+        x, y, w, h = cv2.boundingRect(contour)
+        max_edge = max(h, w)
+        blank = np.zeros((max_edge, max_edge), np.uint8)
         
-        image_name = images.split(".")[-2]
 
-        print(image_name)
+        x1, x2 = int((max_edge - h) / 2), int((max_edge + h) / 2)
+        y1, y2 = int((max_edge - w) / 2), int((max_edge + w) / 2)
 
-        image = cv2.imread(r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests"+f"\\{images}")
-
-        save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\ParsingTests\Tests"+f"\\{image_name}"
-
-        os.makedirs(save_path, exist_ok=True)
-
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        cv2.imwrite(f"{save_path}\\gray.png", gray)
-
-        blur = cv2.GaussianBlur(gray, (3,3), 0)
-        cv2.imwrite(f"{save_path}\\blur.png", blur)
-
-        _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        cv2.imwrite(f"{save_path}\\thresh.png", thresh)
-
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        #print(f"Contours is this: {contours}")
-        #print(f"A single contour: {contours[0]}")
-        #print(f"Its type is: {type(contours[0])}")
+        blank[x1:x2, y1:y2] = MaskedLetter[y:y + h, x:x + w]
+        blank = cv2.copyMakeBorder(blank, 5,5,5,5, borderType=cv2.BORDER_CONSTANT, value=0)  
         
-        char_images = []
-        only_contours = []
-        for contour in contours:
+        letter = cv2.resize(blank, (32,32))
 
-            min_x = min(point[0][0] for point in contour)
-            max_x = max(point[0][0] for point in contour)
-            min_y = min(point[0][1] for point in contour)
-            max_y = max(point[0][1] for point in contour)
+        cv2.imwrite(save_path + f"\\{index}.jpg", letter)
 
-            contour_image_width = max_x - min_x + 1
-            contour_image_height = max_y - min_y + 1
-            contour_image = np.zeros((contour_image_height, contour_image_width), dtype=np.uint8)
+path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\dataset\ender"
 
-            for point in contour:
-                x, y = point[0]
-                contour_image[y - min_y, x - min_x] = 255
+save_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\dataset\ender\1"
 
-            x, y, w, h = cv2.boundingRect(contour)
-            char = thresh[y:y+h, x:x+w]
-
-            char_images.append(char)
-            only_contours.append(contour_image)
-
-        for i, char in enumerate(char_images):
-            cv2.imwrite(f"{save_path}\{i}_cut.png", char)
-            cv2.imwrite(f"{save_path}\{i}_contour.png", only_contours[i])
+for file in os.listdir(path):
+    img_path = os.path.join(path,file)
+    if img_path.split(".")[-1] == "png":
+        ExtractSet(img_path,save_path=save_path,name="1")
