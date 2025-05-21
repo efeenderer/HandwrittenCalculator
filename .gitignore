@@ -1,6 +1,0 @@
-.gitignore
-dataset/
-Documentation/
-codes/font_recognition/fonts/download
-codes/ModelCodes/EMNIST/
-codes/dummy.py
