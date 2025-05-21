@@ -2,6 +2,7 @@
 new_font_recognition/
 oldAlgorithms/
 ParsingTests/
+Segmentation/
 dataset/
 Documentation/
 codes/font_recognition/fonts/download
