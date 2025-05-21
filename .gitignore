@@ -1,5 +1,6 @@
 .gitignore
 codes/new_font_recognition/
+codes/font_recognition/
 codes/oldAlgorithms/
 codes/ParsingTests/
 codes/Segmentation/
