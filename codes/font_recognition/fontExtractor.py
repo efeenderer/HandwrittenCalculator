@@ -7,6 +7,8 @@ import time as t
 fonts_path = r"E:\Python_Projeler\ComputerVisionProjects\FinalProject\codes\font_recognition\fonts"
 
 for font_name in os.listdir(fonts_path):
+    if font_name == "arial":
+        continue
     font_path = os.path.join(fonts_path,font_name)
 
     all_chars = os.path.join(font_path,"all_chars.png")
@@ -49,4 +51,3 @@ for font_name in os.listdir(fonts_path):
 
     for i, char in enumerate(char_images):
         cv.imwrite(f"{font_path}\{i}.png", char)
-        #cv.imwrite(f"{font_path}\{i}_contour.png", only_contours[i])
