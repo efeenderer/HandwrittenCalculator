@@ -1,4 +1,7 @@
 .gitignore
+new_font_recognition/
+oldAlgorithms/
+ParsingTests/
 dataset/
 Documentation/
 codes/font_recognition/fonts/download
