@@ -1,8 +1,8 @@
 .gitignore
-new_font_recognition/
-oldAlgorithms/
-ParsingTests/
-Segmentation/
+codes/new_font_recognition/
+codes/oldAlgorithms/
+codes/ParsingTests/
+codes/Segmentation/
 dataset/
 Documentation/
 codes/font_recognition/fonts/download
