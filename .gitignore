@@ -1,0 +1,11 @@
+.gitignore
+codes/new_font_recognition/
+codes/font_recognition/
+codes/oldAlgorithms/
+codes/ParsingTests/
+codes/Segmentation/
+dataset/
+Documentation/
+codes/font_recognition/fonts/download
+codes/ModelCodes/EMNIST/
+codes/dummy.py
